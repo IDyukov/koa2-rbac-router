@@ -1,0 +1,40 @@
+{
+  "name": "koa2-rbac-router",
+  "version": "0.1.0",
+  "description": "Koa2 router with out-of-box role-based access control",
+  "main": "index.js",
+  "repository": "https://github.com/IDyukov/koa2-rbac-router",
+  "author": "Igor V. Dyukov <igor.dyukov@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "keywords": [
+    "koa",
+    "koa2",
+    "router",
+    "routing",
+    "rest",
+    "rbac",
+    "authorization",
+    "access control"
+  ],
+  "dependencies": {
+    "koa2": "^2.0.0-alpha.7"
+  },
+  "devDependencies": {
+    "ava": "^2.2.0",
+    "nyc": "^14.1.1"
+  },
+  "scripts": {
+    "test": "NODE_ENV=development ava",
+    "test+cover": "NODE_ENV=development nyc ava"
+  },
+  "ava": {
+    "files": [
+      "test/test_*.js"
+    ],
+    "failFast": true,
+    "serial": true,
+    "tap": false,
+    "verbose": true
+  }
+}
