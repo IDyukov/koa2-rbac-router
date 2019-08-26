@@ -411,78 +411,9 @@ Spec delimiter regexp. Default: `/[,\s]+/`.
 
 
 ### Example
-```javascript
 
-const { Router, RBAC } = require('koa2-rbac-router');
+Please visit [`koa2-rbac-router-example`](https://github.com/IDyukov/koa2-rbac-router-example)
 
-const rootRouter = new Router({
-  /* this function might be async */
-  ctxRolesFetcher: ctx => ctx.session.roles // just an example
-});
-
-rootRouter
-  /* simple mapping */
-  .map('GET /', ctx => { ctx.body = 'Welcome!' })
-  /* classic named route definition */
-  .get('test', '/test', ctx => { ctx.body = 'test' })
-  .map('verify', '/verify', ctx => { ctx.body = { error: false, verified: true } });
-
-/* authentication check */
-async function authCheck (ctx, next) {
-  // auth check code
-  if (ctx.username !== 'valid_username') ctx.throw(401);
-  // await downstream request handlers
-  await next();
-  // postprocess request response
-  ctx.body.done = true;
-};
-
-// define subrouter with actions (named routes)
-const someRouter = new Router({
-  preambleHandler: authCheck // will be invoked before any route handlers of someRouter
-});
-someRouter
-  .map('readSomeList', 'GET /', ctx => { /* ... */ })
-  .get('readSomeItem', '/:itemId', async ctx => { /* ... */ })
-  .put('editSomeItem', '/:itemId', async ctx => { /* ... */ });
-// 'mount' someRouter
-rootRouter.use('/some', someRouter);
-
-// define RBAC
-RBAC.setup({
-  // 'tester' role permits:
-  //    - 'test' action: GET /test
-  //    - 'verify' action: * /verify
-  tester: 'test, verify',
-  // 'reader' role permits actions:
-  //    - whatever 'tester' role permits;
-  //    - 'readSomeList': GET /some/:itemId
-  reader: '@tester, readSomeItem', // -> test, verify, readSomeItem
-  // 'writer' role permits:
-  //    - whatever 'reader' role does;
-  //    - except 'test' action;
-  //    - 'editSomeItem' action: PUT /some/:itemId
-  writer: ['@reader', '!test', 'editSomeItem'] // -> verify, readSomeItem, editSomeItem
-});
-// adjust 'reader' role
-RBAC.apply('reader', '@tester readSomeList readSomeItem');
-
-// 'writer' role should be recompiled
-console.log(RBAC.resolve('writer'));
-// expected: Set { verify, readSomeList, readSomeItem, editSomeItem }
-
-// adjust 'writer' role again (note '!@test' instead of '!test')
-RBAC.apply('writer', '@reader !@tester editSomeItem');
-// `writer` role must be recompiled
-console.log(RBAC.resolve('writer'));
-// expected: Set { readSomeList, readSomeItem, editSomeItem }
-
-// match permissions
-console.log(RBAC.match('editSomeItem', 'reader, writer')); // true
-console.log(RBAC.match('verify', 'tester')); // true
-console.log(RBAC.match('verify', 'writer')); // false
-
-```
 
 ## License and Copyright
 
